@@ -1,4 +1,7 @@
-// Función para obtener un chiste de la API
+let currentJoke = '';
+let currentRating = 0;
+let reportJokes = [];
+
 async function fetchJoke() {
     try {
         const response = await fetch('https://icanhazdadjoke.com/', {
@@ -19,15 +22,36 @@ async function fetchJoke() {
     }
 }
 
-// Función para mostrar un chiste en la pantalla
 async function displayJoke() {
-    console.log("sss")
+    currentJoke = await fetchJoke();
     const jokeElement = document.getElementById('joke');
-    const joke = await fetchJoke();
-    jokeElement.innerText = joke;
-    console.log(joke);
+    jokeElement.innerText = currentJoke;
+    console.log(currentJoke);
+    document.getElementById('ratingButtons').style.display = 'block';
 }
 
-// Agregar el evento click al botón "Siguiente chiste"
+function saveReport() {
+    if (currentRating !== 0) {
+        const jokeReport = {
+            joke: currentJoke,
+            score: currentRating,
+            date: new Date()
+        };
+        reportJokes.push(jokeReport);
+        console.log(reportJokes);
+    }
+}
+
 const nextJokeBtn = document.getElementById('nextJokeBtn');
-nextJokeBtn.addEventListener('click', displayJoke);
+nextJokeBtn.addEventListener('click', () => {
+    saveReport();
+    currentRating = 0;
+    displayJoke();
+});
+
+const ratingButtons = document.getElementsByClassName('ratingBtn');
+for (let i = 0; i < ratingButtons.length; i++) {
+    ratingButtons[i].addEventListener('click', (event) => {
+        currentRating = parseInt(event.target.getAttribute('data-score'));
+    });
+}
