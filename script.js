@@ -26,24 +26,58 @@ async function fetchWeather() {
 fetchWeather();
 
 
-async function fetchJoke() {
-    try {
-        const response = await fetch('https://icanhazdadjoke.com/', {
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
+let currentJokeSource = 0;
 
-        if (!response.ok) {
-            throw new Error('Error al obtener el chiste');
-        }
-
-        const jokeData = await response.json();
-        return jokeData.joke;
-    } catch (error) {
-        console.error('Error:', error);
-        return 'No se pudo obtener un chiste';
+// Función para obtener un chiste de la API de icanhazdadjoke
+async function fetchDadJoke() {
+  const url = "https://icanhazdadjoke.com/";
+  const options = {
+    headers: {
+      Accept: "application/json"
     }
+  };
+
+  try {
+    const response = await fetch(url, options);
+    const jokeData = await response.json();
+    return jokeData.joke;
+  } catch (error) {
+    console.error("Error al obtener chiste de icanhazdadjoke:", error);
+    return null;
+  }
+}
+
+// Función para obtener un chiste de la API de Chuck Norris Joke
+async function fetchChuckNorrisAPIJoke() {
+  const url = "https://api.chucknorris.io/jokes/random";
+
+  try {
+    const response = await fetch(url);
+    const jokeData = await response.json();
+    return jokeData.value;
+  } catch (error) {
+    console.error("Error al obtener chiste de JokeAPI:", error);
+    return null;
+  }
+}
+
+// Función para obtener un chiste de una fuente seleccionada
+async function fetchJoke() {
+  // Alternar entre las fuentes de chistes
+  currentJokeSource = (currentJokeSource + 1) % 2;
+  console.log(currentJokeSource)
+  if (currentJokeSource === 0) {
+    return await fetchDadJoke();
+  } else {
+    return await fetchChuckNorrisAPIJoke();
+  }
+}
+
+// Modificar la función nextJoke para utilizar la función fetchJoke
+async function nextJoke() {
+  // ...
+  const joke = await fetchJoke();
+  return joke;
 }
 
 async function displayJoke() {
